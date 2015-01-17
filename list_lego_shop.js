@@ -30,7 +30,68 @@ var url = 'http://shop.lego.com/en-US/Whats-New-Category';
 	en-AT - Austria / English, de-AT - Österreich / Deutsch
 	ko-KR - 대한민국 / 한글
 */
-	
+var options = {
+	'au': ['en'],
+	'be': ['en', 'fr'],
+	'ca': ['en', 'fr'],
+	'cz': ['en'],
+	'dk': ['en'],
+	'de': ['en', 'de'],
+	'fi': ['en'],
+	'fr': ['en', 'fr'],
+	'hu': ['en'],
+	'ie': ['en'],
+	'it': ['en', 'it'],
+	'lu': ['en', 'fr', 'de'],
+	'nl': ['en'],
+	'nz': ['en'],
+	'no': ['en'],
+	'pl': ['en'],
+	'pt': ['en'],
+	'es': ['en', 'es'],
+	'ch': ['en', 'de', 'fr'],
+	'se': ['en'],
+	'gb': ['en'],
+	'us': ['en'],
+	'at': ['en', 'de'],
+	'kr': ['ko']
+}
+
+function array_contains(arr, e) {
+	var i = 0;
+	while (i < arr.length) {
+		if (arr[i++] === e) return true;
+	}
+	return false;
+}
+
+var args = require('system').args;
+if (array_contains(args, '-h') || array_contains(args, '--help')) {
+		console.error(args[0] + ' [country [language]]\n' +
+'    country - ISO 3166-1 two-letter country code (default: us)\n' +
+'    language - ISO 639-1 two-letter language code (default:\n' +
+'               the first language of country language list, mainly en)')
+		phantom.exit(0);
+}
+if (args.length > 1) {
+	if (!(args[1] in options)) {
+		console.error('"' + args[1] +
+									'" is not a valid ISO 3166-1 two-letter country code.');
+		phantom.exit(-1);
+	}
+	var lang = options[args[1]][0]
+	if (args.length > 2) {
+		if (!array_contains(options[args[1]], args[2])) {
+			console.error('"' + args[2] +
+										'" is not a valid ISO 639-1 two-letter language code.');
+			phantom.exit(-1);
+		}
+		lang = args[2]
+	}
+	url = 'http://shop.lego.com/' + lang + '-' + args[1].toUpperCase() +
+				'/Whats-New-Category';
+}
+
 var product_pattern = new RegExp('<ul id="product-badges">(.*?)</ul>.*?<h4>.*?<a title="(.*?)" name="(.*?)" href="(.*?)">.*?<ul.*?<em>[$£€]?([0-9,.]*).*?(?:<em>[$£]?([0-9,.]*).*?</ul>|</ul>).*?<div.*?>(.*?)</div>', 'g');
 // 1: badge, 2: title, 3: number, 4: url, 5: price, 6: sale price, 7: avaialable
 
