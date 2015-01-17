@@ -12,11 +12,12 @@ _loaded_designes = {}
 _bricklink_id_pattern = re.compile(
 	"<a href='http://www[.]bricklink[.]com/catalogItem[.]asp[?]P=.*?'>(.*?)</a>")
 
-def make_design(id):
+def make_design(id, force = False):
 	if id in _loaded_designes:
 		return _loaded_designes[id]
 	design = Design(id)
-	design.read()
+	design.read(force)
+	if design.name is None: return None
 	_loaded_designes[id] = design
 	return design
 
@@ -34,17 +35,20 @@ class Design:
 							self.first_year, self.last_year, self.bricklink_id, self.updated)
 		return ret.encode('utf-8')
 
-	def read(self):
+	def read(self, force = False):
 		(self.name, self.category, self.first_year, self.last_year,
 				self.bricklink_id, self.updated) = self._query_db()
-		if not self.name:
-			if self.id in rebrickable_id_to_bricklink:
+		if (not self.name) or force:
+			if (self.id in rebrickable_id_to_bricklink) and not force:
 				self.bricklink_id = rebrickable_id_to_bricklink[self.id]
 			else:
 				f = util.urlopen('http://rebrickable.com/parts/%s' % self.id)
 				res = f.read()
 				f.close()
 				match = _bricklink_id_pattern.search(res)
+				if match is None: # like part 79015-1 of collection set 5004261-1 
+					print 'part %s does not exist.' % self.id
+					return
 				self.bricklink_id = match.group(1)
 
 			params = urllib.urlencode({'key': Design.api_key, 'format': 'json',

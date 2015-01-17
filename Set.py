@@ -18,9 +18,17 @@ def make_set(id, readable_id):
 	_loaded_sets[id] = set
 	return set
 
+ALL = 1
+EXCEPT_MINIFIG = 2
+MINIFIG_ONLY = 3
+
 class Set:
 	api_key = None
 	cursor = None
+
+	ALL = 1
+	EXCEPT_MINIFIG = 2
+	MINIFIG_ONLY = 3
 
 	# members - "id", name, readable_id, pieces, theme, year, updated, blocks
 	#   blocks is tuple of (Part, qty, spare, updated).
@@ -56,7 +64,8 @@ class Set:
 			now = datetime.now()
 			self.blocks = [ ( make_part(i['part_id'], int(i['ldraw_color_id'])),
 						int(i['qty']), int(i['type']) - 1, now )
-					for i in info['parts'] ]
+					for i in info['parts']
+					if make_part(i['part_id'], int(i['ldraw_color_id'])) is not None]
 
 			params = urllib.urlencode({'key': Set.api_key, 'format': 'json',
 																	'set_id': self.id})
@@ -140,10 +149,19 @@ class Set:
 				+ "WHERE set_id = ? and part_id = ? and color = ?",
 			(b[1], b[2], b[3], self.id, b[0].id, b[0].color) )
 
-	def bulk_value(self):
+	def bulk_value(self, type = ALL):
 		sum = 0
 		warning = ''
-		for b in self.blocks:
+
+		if type == EXCEPT_MINIFIG:
+			blocks = [i for i in self.blocks if i[0].design.category[:7] != 'Minifig']
+			# "Minifigs" and "Minifig Accessories" categories
+		elif type == MINIFIG_ONLY:
+			blocks = [i for i in self.blocks if i[0].design.category[:7] == 'Minifig']
+		else:
+			blocks = self.blocks
+
+		for b in blocks:
 			if b[0].new_sold_price is not None:
 				sum += b[0].new_sold_price * b[1]
 			elif b[0].used_sold_price is not None:

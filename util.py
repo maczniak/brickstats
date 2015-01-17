@@ -39,9 +39,9 @@ def _decode_html_entity_chr(match):
 
 def decode_html_entity(s):
 	s = html_entity_pattern.sub(_decode_html_entity_chr, s)
-	s = s.replace('&amp;quot;', '"')
 	s = s.replace('&amp;amp;', '&')
 	s = s.replace('&amp;', '&')
+	s = s.replace('&quot;', '"') # for &quot; and &amp;quot;
 	# both &amp;amp; and &amp; exist in rebrickable database.
 	return s
 

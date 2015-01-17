@@ -23,6 +23,7 @@ def make_part(id, color):
 		return _loaded_parts[key]
 	part = Part(id, color)
 	part.read()
+	if part.design is None: return None
 	_loaded_parts[key] = part
 	return part
 
@@ -55,6 +56,8 @@ class Part:
 
 	def read(self):
 		self.design = make_design(self.id)
+		if self.design is None:
+			return
 
 		(self.sets, self.qty, self.abundance_updated, self.new_sold_price,
 				self.used_sold_price, self.new_lots_price, self.used_lots_price,

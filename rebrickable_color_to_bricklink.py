@@ -141,4 +141,5 @@ rebrickable_color_to_bricklink = {
 	# missing: (160, 'Fabuland Orange'), (161, 'Dark Yellow'), Modulex Colors
 	9999: (-1, '(No Color)'),
 	-1: (-1, 'Unknown'),
+	89: (-1, 'Royal Blue'), # part bb556 of set 2852725
 }
