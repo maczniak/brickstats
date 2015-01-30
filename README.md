@@ -1,6 +1,8 @@
 # brickstats
 Lego product info utilities
 
+Refer to [this blog post](http://www.linkedbigdata.com/2015/01/lego-bulk-index.html).
+
 TODO:
 * lego shop stock & price tracker
 * updated information processing

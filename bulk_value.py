@@ -41,7 +41,7 @@ if __name__ == "__main__":
 		set_nums = [ '31027' ]
 
 	for set_num in set_nums:
-		set = make_set(set_num + '-1', int(set_num))
+		set = make_set(set_num)
 		if set is None:
 			print '%s|-1' % set_num
 			continue

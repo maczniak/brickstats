@@ -4,12 +4,23 @@
 from datetime import datetime
 import json
 import urllib
+from rebrickable_latest_set_id import rebrickable_latest_set_id
 from Part import Part, make_part
 import util
 
 _loaded_sets = {}
 
-def make_set(id, readable_id):
+def latest_rebrickable_set_id(id):
+	id = int(id)
+	if id in rebrickable_latest_set_id:
+		return rebrickable_latest_set_id[id]
+	return '%s-1' % id
+	
+def make_set(id, readable_id = None):
+	if readable_id is None:
+		readable_id = id
+		id = latest_rebrickable_set_id(readable_id)
+
 	if id in _loaded_sets:
 		return _loaded_sets[id]
 	set = Set(id, readable_id)
@@ -195,9 +206,10 @@ if __name__ == "__main__":
 		set_nums = [ '31031' ] # example
 
 	for set_num in set_nums:
-		set = make_set(set_num + '-1', int(set_num))
+		id = latest_rebrickable_set_id(set_num)
+		set = make_set(id, set_num)
 		if not set:
-			print 'set %s-1 does not exist in database.' % set_num
+			print 'set %s does not exist in database.' % id
 			continue
 		print util.line_wrap('new set: %s %s (%s, %s) %s pieces' % (set.id,
 						util.to_ascii_safe(set.name), set.theme, set.year, set.pieces), 0)
